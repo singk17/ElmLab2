@@ -1,7 +1,7 @@
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
 
-type alias Core {
+type alias Core = {
     truetime: Float
     , time: Float
     , lasttime: Float
