@@ -1,4 +1,4 @@
-module Dunya exposing (..)
+module Kam exposing (..)
 
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
