@@ -57,11 +57,31 @@ mainUpdate msg model =
           N -> { updatedTime | nmodel = Tuple.second <| Neaha.update msg (updatedTime.timedata, updatedTime.nmodel) }
     Core.Shared (Core.Next a) -> model
     Core.Shared (Core.Restart) -> model
-    Core.AMsg a -> { model | amodel = Tuple.second <| Anaum.update msg (model.timedata, model.amodel) }
-    Core.DMsg a -> { model | dmodel = Tuple.second <| Dunya.update msg (model.timedata, model.dmodel) }
-    Core.KMsg a -> { model | kmodel = Tuple.second <| Kam.update msg (model.timedata, model.kmodel) }
-    Core.LMsg a -> { model | lmodel = Tuple.second <| Lakysha.update msg (model.timedata, model.lmodel) }
-    Core.NMsg a -> { model | nmodel = Tuple.second <| Neaha.update msg (model.timedata, model.nmodel) }
+    Core.AMsg a ->
+      let
+        (ntime,nmodel) = Anaum.update msg (model.timedata, model.amodel)
+      in
+        { model | amodel = nmodel, timedata = ntime }
+    Core.DMsg a ->
+      let
+        (ntime,nmodel) = Dunya.update msg (model.timedata, model.dmodel)
+      in
+        { model | dmodel = nmodel, timedata = ntime }
+    Core.KMsg a ->
+      let
+        (ntime,nmodel) = Kam.update msg (model.timedata, model.kmodel)
+      in
+        { model | kmodel = nmodel, timedata = ntime }
+    Core.LMsg a ->
+      let
+        (ntime,nmodel) = Lakysha.update msg (model.timedata, model.lmodel)
+      in
+        { model | lmodel = nmodel, timedata = ntime }
+    Core.NMsg a ->
+      let
+        (ntime,nmodel) = Neaha.update msg (model.timedata, model.nmodel)
+      in
+        { model | nmodel = nmodel, timedata = ntime }
 
 switchSVG : Model -> List (Shape (Core.CoreMsg Anaum.Msg Dunya.Msg Kam.Msg Lakysha.Msg Neaha.Msg))
 switchSVG model =
@@ -77,7 +97,7 @@ view : Model -> Collage (Core.CoreMsg Anaum.Msg Dunya.Msg Kam.Msg Lakysha.Msg Ne
 view model = collage 192 128 (switchSVG model)
 
 main : GameApp Model Msg
-main = gameApp Core.Tick { model = init, view = view, update = mainUpdate, title = "PUT SOME TITLE HERE" }
+main = gameApp Core.Tick { model = init, view = view, update = mainUpdate, title = "Among Us (Bootleg)" }
 
 
 basicUpdate : Core.TimeData -> Float -> Core.TimeData
