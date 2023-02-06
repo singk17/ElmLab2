@@ -6,45 +6,219 @@ import GraphicSVG.App exposing (..)
 import Core
 import Bitwise
 
-type Msg = None
+type Msg = ButtonPress Int
 
-type alias Model = {
-  }
+type alias Model = { correctPassword : List (List Int)
+                    ,userPassword : List Int
+                   }
 
 init : Model
-init = {}
+init = {correctPassword = [[8],[8,6],[8,6,0],[8,6,0,6],[8,6,0,6,4]]
+       ,userPassword = []}
 
 
-update : (Core.CoreMsg a b Msg d e) -> (Core.TimeData,Model) -> (Core.TimeData,Model)
-update msg (timedata,model) = (timedata,model)
+update : (Core.CoreMsg a Msg c d e) -> (Core.TimeData,Model) -> (Core.TimeData,Model)
+update msg (timedata,model) = case msg of
+  Core.DMsg a -> case a of
+    ButtonPress idx -> (timedata,{ model | userPassword = model.userPassword ++ [idx]})
+  _ -> (timedata,model)
 
 
-hex : Int -> Color
-hex c =
+button : Int -> Model -> Shape (Core.CoreMsg a Msg c d e)
+button idx model =
   let
-    r = c |> Bitwise.shiftRightBy 16 |> Bitwise.and 0xff |> toFloat
-    g = c |> Bitwise.shiftRightBy 8 |> Bitwise.and 0xff |> toFloat
-    b = c |> Bitwise.and 0xff |> toFloat
+    x = modBy 3 idx |> toFloat
+    y = idx // 3 |> toFloat
+    fpos = ( x * 12 - 12, y * 12 - 14)
+    color = if (List.member idx model.userPassword) then
+                green -- probably green
+            else
+              hsl (degrees 354) 0.007 0.628
   in
-    rgb r g b
+  square 10
+    |> filled color
+    |> scale 1
+    |> move fpos
+    |> notifyTap (Core.DMsg (ButtonPress idx))
 
-uglyBlue = hex 0x2f1fdf
-lightBlue = hex 0xa4abde
+createButtons model = List.map (\x -> button x model) (List.range 0 8) |> group
 
-shapes : (Core.TimeData,Model) -> List (Shape (Core.CoreMsg a b Msg d e))
-shapes model = [
-    cornerCut
-  ]
+shapes : (Core.TimeData,Model) -> List (Shape (Core.CoreMsg a Msg c d e))
+shapes (timedata,model) = [bg,
+                          -- buttonReponse --
+                          
+                           [square 10
+                             |> filled grey
+                             |> scale 5
+                            ,createButtons model
+                           {- ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (0,10)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (-12,10)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (12,10)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (-12,-2)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (0,-2)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (12,-2)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (-12,-14)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (0,-14)
+                           ,square 10
+                             |> filled (hsl (degrees 354) 0.007 0.628)
+                             |> scale 1
+                             |> move (12,-14) -}
+                           , circle 10
+                             |> filled black
+                             |> scale 0.2
+                             |> move (-18,20)
+                           ,circle 10
+                             |> filled black
+                             |> scale 0.2
+                             |> move (-10,20)
+                           ,circle 10 
+                             |> filled black
+                             |> scale 0.2
+                             |> move (-1,20)
+                           ,circle 10
+                             |> filled black
+                             |> scale 0.2
+                             |> move (8,20)
+                           ,circle 10
+                             |> filled black
+                             |> scale 0.2
+                             |> move (17,20)
+                           ,rect 10 20
+                             |> filled (hsl (degrees 0) 0.002 0.331)
+                             |> rotate (degrees 90)
+                             |> scaleX 2
+                             |> scaleY 0.4
+                             |>move (0,-23)
+                           ,triangle 10
+                             |> filled (hsl (degrees 0) 0.002 0.331)
+                             |> rotate (degrees 90)
+                             |> scale 0.25
+                             |> scaleX 2
+                             |> scaleY 1
+                             |> move (-20.1,-23.8)
+                           ,triangle 10
+                             |> filled (hsl (degrees 0) 0.002 0.331)
+                             |> rotate (degrees 90)
+                             |> scale 0.25
+                             |> scaleX 2
+                             |> scaleY 1
+                             |> move (20.1,-23.8)
+                           ]
+                             |> group
+                             |> move (32,0)
+                             |> scale 1.5
+                          ,
 
+                        
+                          -- buttonPattern --
 
-cornerCut =
-  let
-    r = rectangle 30 35
-        |> filled uglyBlue
-    t = triangle 7
-        |> filled red
-        |> rotate (degrees (10))
-        |> move (-13,16.5)
-  in
-  subtract t r
-    |> makeTransparent 0.98
+                          [square 10
+                            |> filled grey
+                            |> scale 5
+                           -- black bg of buttons --
+                          ,square 10
+                            |> filled black
+                            |> scale 3.5
+                            |> move (-0.5,-2)
+                          -- actual buttons --
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (0,10)
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (-12,10)
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (-12,-2)
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (-12,-14)
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (0,-14)
+                          ,square 10
+                            |> filled black
+                            |> scale 1
+                            |> move (12,-14)
+                          ,circle 10
+                            |> filled black
+                            |> scale 0.2
+                            |> move (-18,20)
+                          ,circle 10
+                            |> filled black
+                            |> scale 0.2
+                            |> move (-10,20)
+                          ,circle 10
+                            |> filled black
+                            |> scale 0.2
+                            |> move (-1,20)
+                          ,circle 10
+                            |> filled black
+                            |> scale 0.2
+                            |> move (8,20)
+                          ,circle 10
+                            |> filled black
+                            |> scale 0.2
+                            |> move (17,20)
+                          ,rect 10 20
+                            |> filled (hsl (degrees 0) 0.002 0.331)
+                            |> rotate (degrees 90)
+                            |> scaleX 2
+                            |> scaleY 0.4
+                            |> move (0,-23)
+                          ,triangle 10
+                            |> filled (hsl (degrees 0) 0.002 0.331)
+                            |> rotate (degrees 90)
+                            |> scale 0.25
+                            |> scaleX 2
+                            |> scaleY 1
+                            |> move (-20.1,-23.8)
+                          ,triangle 10
+                            |> filled (hsl (degrees 0) 0.002 0.331)
+                            |> rotate (degrees 90)
+                            |> scale 0.25
+                            |> scaleX 2
+                            |> scaleY 1
+                            |> move (20.1,-23.8)
+
+                          ]
+                            |> group
+                            |> move (-30,0)
+                            |> scale 1.5
+                        ]
+
+   
+
+bg = rectangle 10 20
+      |> filled (hsl (degrees 354) 0.007 0.467)  
+      |> rotate (degrees 90)
+      |> scale 15
