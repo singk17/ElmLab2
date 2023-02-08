@@ -29,3 +29,18 @@ type CoreMsg a b c d e = Tick Float GetKeyState
                     | LMsg d
                     | NMsg e
 
+restartTime : TimeData -> TimeData
+restartTime timedata = {
+      timedata |
+      time = 0
+    , lasttime = timedata.truetime
+    , deltatime = 0
+  }
+
+tickTime : Float -> TimeData -> TimeData
+tickTime tick timedata = {
+      timedata |
+      truetime = tick
+    , time = tick - timedata.lasttime
+    , deltatime = tick - timedata.truetime
+  }
