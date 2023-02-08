@@ -1,4 +1,4 @@
-module Core exposing (TimeData,emptyTime,SharedMsg(..),CoreMsg(..))
+module Core exposing (TimeData,emptyTime,SharedMsg(..),CoreMsg(..),restartTime,tickTime)
 
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
