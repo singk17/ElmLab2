@@ -36,7 +36,7 @@ init = {
     , kmodel = Kam.init
     , lmodel = Lakysha.init
     , nmodel = Neaha.init
-    , stage = StartScreen
+    , stage = K
   }
 
 
@@ -46,15 +46,35 @@ mainUpdate msg model =
   case msg of
     Core.Tick t kd ->
       let
-        updatedTime = { model | timedata = basicUpdate model.timedata t }
+        updatedTime = { model | timedata = Core.tickTime t model.timedata }
       in
         case model.stage of
           StartScreen -> updatedTime
-          A -> { updatedTime | amodel = Tuple.second <| Anaum.update msg (updatedTime.timedata, updatedTime.amodel) }
-          D -> { updatedTime | dmodel = Tuple.second <| Dunya.update msg (updatedTime.timedata, updatedTime.dmodel) }
-          K -> { updatedTime | kmodel = Tuple.second <| Kam.update msg (updatedTime.timedata, updatedTime.kmodel) }
-          L -> { updatedTime | lmodel = Tuple.second <| Lakysha.update msg (updatedTime.timedata, updatedTime.lmodel) }
-          N -> { updatedTime | nmodel = Tuple.second <| Neaha.update msg (updatedTime.timedata, updatedTime.nmodel) }
+          A ->
+            let
+              (updTime,newModel) = Anaum.update msg (updatedTime.timedata, updatedTime.amodel)
+            in
+            { model | timedata = updTime, amodel = newModel }
+          D ->
+            let
+              (updTime,newModel) = Dunya.update msg (updatedTime.timedata, updatedTime.dmodel)
+            in
+            { model | timedata = updTime, dmodel = newModel }
+          K ->
+            let
+              (updTime,newModel) = Kam.update msg (updatedTime.timedata, updatedTime.kmodel)
+            in
+            { model | timedata = updTime, kmodel = newModel }
+          L ->
+            let
+              (updTime,newModel) = Lakysha.update msg (updatedTime.timedata, updatedTime.lmodel)
+            in
+            { model | timedata = updTime, lmodel = newModel }
+          N ->
+            let
+              (updTime,newModel) = Neaha.update msg (updatedTime.timedata, updatedTime.nmodel)
+            in
+            { model | timedata = updTime, nmodel = newModel }
     Core.Shared (Core.Next a) -> model
     Core.Shared (Core.Restart) -> model
     Core.AMsg a ->
@@ -98,15 +118,6 @@ view model = collage 192 128 (switchSVG model)
 
 main : GameApp Model Msg
 main = gameApp Core.Tick { model = init, view = view, update = mainUpdate, title = "Among Us (Bootleg)" }
-
-
-basicUpdate : Core.TimeData -> Float -> Core.TimeData
-basicUpdate timedata tick = {
-      timedata |
-      truetime = tick
-    , time = tick - timedata.lasttime
-    , deltatime = tick - timedata.truetime
-  }
 
 startScreenShapes : (Core.TimeData,Model) -> List (Shape (Core.CoreMsg Anaum.Msg Dunya.Msg Kam.Msg Lakysha.Msg Neaha.Msg))
 startScreenShapes (timedata,model) =

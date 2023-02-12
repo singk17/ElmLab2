@@ -30,7 +30,7 @@ type CoreMsg a b c d e = Tick Float GetKeyState
                     | NMsg e
 
 restartTime : TimeData -> TimeData
-restartTime timedata = {
+restartTime timedata = Debug.log "restarted" {
       timedata |
       time = 0
     , lasttime = timedata.truetime
