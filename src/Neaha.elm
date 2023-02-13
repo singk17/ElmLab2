@@ -123,7 +123,7 @@ shapes (timedata,model) =
       |> filled black
       |> scale 0.5
       |> move (-45,43)
-      , text (String.fromFloat (timedata.time))
+      , text (String.fromInt (floor timedata.time))
       |> filled black
       |> scale 0.5
       |> move (-45,35)
