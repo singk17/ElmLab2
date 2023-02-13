@@ -25,7 +25,6 @@ type alias Wire = {
   startPos: (Float,Float)
   ,endPos:(Float,Float)
   ,colour:Color
-  , screen : Screen
     }
 
 defaultWireList =[ 
@@ -62,7 +61,7 @@ getElement  li idx = case (List.drop idx li |> List.head) of
   Nothing -> Debug.todo "index out of bounds"
 
 init : Model
-init = {time = 0, pos = (0,0), state = Waiting, letGoPos = (0,0), connectedWires = [], startPos = (0,0), selectedLine = 0, screen=Game}
+init = {time = 0, pos = (0,0), state = Waiting, letGoPos = (0,0), connectedWires = [], startPos = (0,0), selectedLine = 0, screen = Game}
 
 type Msg 
   = Tick Float GetKeyState
@@ -130,8 +129,18 @@ shapes (timedata,model) =
       |>filled white
       |>scale(2) 
       |>move(-45,0)
-      
-
+      ,
+      group
+        [
+            roundedRect 40 20 3
+              |> filled green
+              |> addOutline (solid 1) blue
+          , text "Next"
+              |> centered
+              |> filled blue
+              |> move (0,-4)
+        ] |> move (0,-20)
+          |> notifyTap (Core.Shared (Core.Next 1))
       ]
   Game ->
     let
@@ -209,11 +218,11 @@ update msg (timedata,model) =
               newConnectedWires =  model.connectedWires ++ [ model.selectedLine ]
             in
             if (List.length newConnectedWires == List.length defaultWireList) then 
-             Debug.log "done" (timedata ,{model | state = Waiting, screen=Success, connectedWires = newConnectedWires})
+             (timedata ,{model | state = Waiting, screen=Success, connectedWires = newConnectedWires})
             else
-             Debug.log "next" (timedata,{model | state = Waiting, letGoPos=(x,y), connectedWires = newConnectedWires  })
+             (timedata,{model | state = Waiting, letGoPos=(x,y), connectedWires = newConnectedWires  })
           else 
-            Debug.log "fail" (timedata,{model | state = Waiting})
+            (timedata,{model | state = Waiting})
       _ -> (timedata,model)
     _ -> (timedata,model)
 

@@ -1,4 +1,4 @@
-module Core exposing (TimeData,emptyTime,SharedMsg(..),CoreMsg(..),restartTime,tickTime)
+module Core exposing (TimeData,emptyTime,SharedMsg(..),CoreMsg(..),Minigame(..),restartTime,tickTime)
 
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
@@ -18,8 +18,15 @@ emptyTime = {
     , deltatime = 0
   }
 
+type Minigame =   Passcode
+                | Leafs
+                | Wires
+                | Swipe
+
 type SharedMsg =  Next Int
                 | Restart
+                | GotoMinigame Minigame
+                | SetupMinigame Minigame
 
 type CoreMsg a b c d e = Tick Float GetKeyState
                     | Shared SharedMsg
@@ -30,7 +37,7 @@ type CoreMsg a b c d e = Tick Float GetKeyState
                     | NMsg e
 
 restartTime : TimeData -> TimeData
-restartTime timedata = Debug.log "restarted" {
+restartTime timedata = {
       timedata |
       time = 0
     , lasttime = timedata.truetime

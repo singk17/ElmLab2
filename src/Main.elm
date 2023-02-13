@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Browser
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
 
@@ -36,7 +35,7 @@ init = {
     , kmodel = Kam.init
     , lmodel = Lakysha.init
     , nmodel = Neaha.init
-    , stage = K
+    , stage = D
   }
 
 
@@ -75,8 +74,25 @@ mainUpdate msg model =
               (updTime,newModel) = Neaha.update msg (updatedTime.timedata, updatedTime.nmodel)
             in
             { model | timedata = updTime, nmodel = newModel }
-    Core.Shared (Core.Next a) -> model
-    Core.Shared (Core.Restart) -> model
+    Core.Shared a ->
+      case a of
+          Core.Next succ ->
+            let
+              (_,newModel) = Dunya.update msg (model.timedata, model.dmodel)
+            in
+              { init | timedata = Core.restartTime model.timedata, dmodel = newModel, stage = D }
+          Core.Restart -> { init | timedata = Core.restartTime model.timedata }
+          Core.GotoMinigame mini ->
+            let
+              (_, newModel) = Debug.log "mupd" <| Dunya.update (Core.Shared (Core.SetupMinigame mini)) (model.timedata, model.dmodel)
+              nextStage = case mini of
+                Core.Leafs -> N
+                Core.Swipe -> A
+                Core.Passcode -> K
+                Core.Wires -> L
+            in
+              { model | timedata = Core.restartTime model.timedata, dmodel = newModel, stage = nextStage }
+          _ -> model
     Core.AMsg a ->
       let
         (ntime,nmodel) = Anaum.update msg (model.timedata, model.amodel)

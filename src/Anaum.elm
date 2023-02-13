@@ -4,6 +4,7 @@ import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
 
 import Core
+import Html exposing (a)
 
 type Msg = NewPos (Float,Float)
           | MovePos (Float,Float)
@@ -22,10 +23,11 @@ type alias Model = {
                    , fail2 : String
                    , success : String
                    , lastmsgtime : Float
+                   , succeeded : Bool
                    }
 
 init : Model
-init = { pos = (0,-31), state = Waiting, swipeTime = 0, fail1 = "", fail2 = "", success = "", lastmsgtime = 0 }
+init = { pos = (0,-31), state = Waiting, swipeTime = 0, fail1 = "", fail2 = "", success = "", lastmsgtime = 0, succeeded = False }
 
 
 update : (Core.CoreMsg Msg b c d e) -> (Core.TimeData,Model) -> (Core.TimeData,Model)
@@ -48,7 +50,7 @@ update msg (timedata,model) = case msg of
             if (model.pos < (40, 18)) then
               (timedata, {model | fail1 = "Bad read, try again", pos = (-50, 18), state = Waiting, lastmsgtime = timedata.truetime  })
             else if (model.swipeTime > 1) && (model.swipeTime < 2)then 
-              (timedata, {model | success = "Successful", pos = (-50, 18), state = Waiting, lastmsgtime = timedata.truetime })
+              (timedata, {model | success = "Successful", pos = (-50, 18), state = Waiting, lastmsgtime = timedata.truetime, succeeded = True })
             else if (model.swipeTime > 2) then 
               (timedata, {model | fail2 = "Too slow, try again", pos = (-50, 18), state = Waiting, lastmsgtime = timedata.truetime })
             else if (model.swipeTime < 1) then
@@ -67,7 +69,11 @@ update msg (timedata,model) = case msg of
     case model.state of
       Dragging a -> (timedata,{ newmodel | swipeTime = model.swipeTime + timedata.deltatime})
       _ -> (timedata,newmodel) 
-  _ -> (timedata,model)     
+  _ -> (timedata,model)
+
+
+doNothing : a -> a
+doNothing a = a
 
 shapes : (Core.TimeData,Model) -> List (Shape (Core.CoreMsg Msg b c d e))
 shapes (timedata,model) = 
@@ -88,15 +94,19 @@ shapes (timedata,model) =
     |> scale 3.48
     |> move (-39,-28)
   , card
-      |> move ( case model.state of
+      |> move (
+                if (not model.succeeded) then case model.state of
                   Waiting -> model.pos
                   Dragging delta -> let (x,y) = add delta model.pos in (x,18)
+                else
+                  model.pos
               )
-      |> ( case model.state of 
+      |> ( if (not model.succeeded) then case model.state of 
              Waiting ->
                notifyMouseDownAt (\x -> (Core.AMsg (NewPos x)))
              Dragging _ ->
                identity 
+            else doNothing
           )
   , biggray (hsl (degrees 0) 0.039 0.612)
   , biggray (hsl (degrees 0) 0.051 0.768)
@@ -227,7 +237,24 @@ shapes (timedata,model) =
           |> notifyMouseUp (Core.AMsg LetGo)
           |> notifyLeave (Core.AMsg LetGo)
         ]
-  )
+  ) ++  ( if (model.succeeded) then
+            [
+                group
+                  [
+                      roundedRect 25 14 2
+                        |> filled green
+                        |> addOutline (solid 1) blue
+                    , text "Next"
+                        |> size 8
+                        |> centered
+                        |> filled blue
+                        |> move (0,-3)
+                  ] |> move (75,-50)
+                    |> notifyTap (Core.Shared (Core.Next 1))
+            ]
+          else
+            []
+        )
 
 sub (x,y) (u,v) = (x-u,y-v)
 add (x,y) (u,v) = (x+u,y+v) 

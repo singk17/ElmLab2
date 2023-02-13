@@ -4,6 +4,13 @@ import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (..)
 
 import Core
+import Core exposing (SharedMsg(..))
+
+doNothing : a -> a
+doNothing a = a
+
+flashOn = green
+flashOff = red
 
 shapes : (Core.TimeData,Model) -> List (Shape (Core.CoreMsg a Msg c d e))
 shapes (timedata,model) = 
@@ -43,9 +50,11 @@ shapes (timedata,model) =
                             |> filled darkGray
                   ,    text "Play"
                             |> centered
-                            |> size 8
+                            |> size 12
+                            |> sansserif
                             |> filled white
-                            |> move(0, -3)
+                            |> addOutline (solid 0.3) black
+                            |> move(0, -4)
                   ]
                      |> move (0, -25)
                      |> notifyTap (Core.DMsg WelcomeToCaf)
@@ -70,7 +79,10 @@ shapes (timedata,model) =
                 |> move (65,5)
             ,text "Cafeteria"
                 |> centered
+                |> size 18
+                |> sansserif
                 |> filled yellow
+                |> addOutline (solid 0.5) black
                 |> scale 0.5
                 |> move (65,10)
             ,astronautRed
@@ -80,22 +92,39 @@ shapes (timedata,model) =
                   [
                        room
                             |> scale 1.75
-                  ,    text "Upper Engine"
+                            |> ( if (List.member False model.minigameStatus) then
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn) 
+                                else
+                                    doNothing
+                                )
+                  ,    text "Upper"
                             |> centered
-                            |> size 6
+                            |> size 10
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(0, 6)
+                  ,    text "Engine"
+                            |> centered
+                            |> size 10
+                            |> sansserif
+                            |> filled yellow
+                            |> addOutline (solid 0.3) black
+                            |> move(0, -4)
                   ]
                      |> move (-65, 5)
                      |> notifyTap (Core.DMsg CafToUppEng)
+
             , group
                   [
                        room
                             |> scale 1.75
                   ,    text "Med Bay"
                             |> centered
-                            |> size 6
+                            |> size 10
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(0, 6)
                   ]
                      |> move (0, -35)
@@ -119,9 +148,20 @@ shapes (timedata,model) =
             ,room
                 |> scale 1.5
                 |> move (0,35)
-            ,text "Upper Engine"
+            ,text "Upper"
                 |> centered
+                |> sansserif
+                |> size 18
                 |> filled yellow
+                |> addOutline (solid 0.6) black
+                |> scale 0.5
+                |> move (0,45)
+            ,text "Engine"
+                |> centered
+                |> sansserif
+                |> size 18
+                |> filled yellow
+                |> addOutline (solid 0.6) black
                 |> scale 0.5
                 |> move (0,35)
             ,astronautRed
@@ -132,10 +172,17 @@ shapes (timedata,model) =
                        room
                             |> move (-25,-5)
                             |> scale 1.5
+                            |>  ( if (getMiniGameStatus model Core.Leafs) then
+                                    doNothing
+                                  else
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn) 
+                                )
                   ,    text "Reactor"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 8
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(-38, -2)
                   ]
                      |> move (-25, -25)
@@ -145,10 +192,17 @@ shapes (timedata,model) =
                        room
                             |> move (25,-5)
                             |> scale 1.5
+                            |>  ( if (getMiniGameStatus model Core.Passcode) then
+                                    doNothing
+                                    else
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn) 
+                                )
                   ,    text "Security"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 8
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(38, -2)
             
                   ]
@@ -159,11 +213,25 @@ shapes (timedata,model) =
                         room
                             |> scale 1.5
                             |> move (25,-20)
-                  ,     text "Lower Engine"
+                            |> ( if (List.drop 2 model.minigameStatus |> List.member False) then 
+                                   addOutline (solid 0.5) (if (timedata.time * 20 |>  (+) 0.2 |> sin |> floor |> (==) 0) then flashOff else flashOn)
+                                 else
+                                    doNothing
+                               )
+                  ,     text "Lower"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 8
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move (25,-10)
+                ,     text "Engine"
+                            |> centered
+                            |> sansserif
+                            |> size 8
+                            |> filled yellow
+                            |> addOutline (solid 0.3) black
+                            |> move (25,-18)
                   ]
                      |> move (-25,-25)
                      |> notifyTap (Core.DMsg UppEngToLowEng)
@@ -186,9 +254,17 @@ shapes (timedata,model) =
             , room
                 |> scale 1.75
                 |> move (-65,20)
+                |>  ( if (getMiniGameStatus model Core.Leafs) then
+                        doNothing
+                        else
+                        addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn) 
+                    )
             , text "Reactor"
                 |> centered
+                |> sansserif
+                |> size 20
                 |> filled yellow
+                |> addOutline (solid 0.5) black
                 |> scale 0.5
                 |> move (-65,30)
             , astronautRed
@@ -196,31 +272,20 @@ shapes (timedata,model) =
                 |> move (-75,15)
             , group
                   [
-                       circle 7
-                            |> filled orange
-                            |> move (-30,40)
-                    ,  rect 10 10
-                            |> filled yellow
-                            |> scaleX 0.25
-                            |> scale 0.3
-                            |> scaleY 2.5
-                            |> move (-30,42)
-                    ,  circle 7
-                            |> filled yellow
-                            |> scale 0.1
-                            |> move (-30,36)
-                  ]
-                     |> move (-25,-25)
-                     |> notifyTap (Core.DMsg ReactToCleanUp)
-            , group
-                  [
                        room
                             |> scale 1.75
                             |> move (90,43)
+                            |>  ( if (getMiniGameStatus model Core.Passcode) then
+                                    doNothing
+                                    else
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn) 
+                                )
                   ,    text "Security"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 11
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move (90,48)
                   ]
                      |> move (-25, -25)
@@ -230,35 +295,52 @@ shapes (timedata,model) =
                        room
                             |> scale 1.5
                             |> move (-22,-15)
-                  ,    text "Lower Engine"
+                            |> ( if (List.drop 2 model.minigameStatus |> List.member False) then 
+                                   addOutline (solid 0.5) (if (timedata.time * 20 |>  (+) 0.2 |> sin |> floor |> (==) 0) then flashOff else flashOn)
+                                 else
+                                    doNothing
+                               )
+                  ,    text "Lower"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 11
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move (-22, -9)
+                  ,    text "Engine"
+                            |> centered
+                            |> sansserif
+                            |> size 11
+                            |> filled yellow
+                            |> addOutline (solid 0.3) black
+                            |> move (-22, -20)
                   ]
                      |> move (25, -25)
                      |> notifyTap (Core.DMsg ReactToLowerEngine)
-            ]
-        CleanUp  ->
-            [ text "CleanUp"
-                |> centered
-                |> filled black
-                |> scale 1
-            , group
-                  [
-                    roundedRect 40 20 5
-                            |> filled green
-                  ,    text "BackToReactor"
-                            |> centered
-                            |> size 8
-                            |> filled black
-                            |> move(0, -3)
-                  ]
-                     |> move (-25,-25)
-                     |> notifyTap (Core.DMsg CleanUpToReact)
-            
-            ]
-
+            ] ++ (if (getMiniGameStatus model Core.Leafs) then
+                    []
+                  else
+                    [
+                        group
+                            [
+                                circle 7
+                                        |> filled orange
+                                        |> move (-30,40)
+                                ,  rect 10 10
+                                        |> filled yellow
+                                        |> scaleX 0.25
+                                        |> scale 0.3
+                                        |> scaleY 2.5
+                                        |> move (-30,42)
+                                ,  circle 7
+                                        |> filled yellow
+                                        |> scale 0.1
+                                        |> move (-30,36)
+                            ]
+                                |> move (-25,-25)
+                                |> notifyTap (Core.Shared (Core.GotoMinigame Core.Leafs))
+                    ]
+                 )
         MedBay  ->
             [ bgMain
             , rect 10 20
@@ -277,10 +359,12 @@ shapes (timedata,model) =
             , room
                   |> scale 1.75
                   |> move (0,-35)
-            , text "MedBay"
-                  |> centered
-                  |> filled yellow
-                  |> scale 0.5
+            ,    text "Med Bay"
+                    |> centered
+                    |> size 10
+                    |> sansserif
+                    |> filled yellow
+                    |> addOutline (solid 0.3) black
                   |> move (0,-25)
             , astronautRed
                 |> scale 0.25
@@ -289,12 +373,25 @@ shapes (timedata,model) =
                   [
                        room
                             |> scale 1.75
-                    
-                  ,    text "Upper Engine"
+                            |> ( if (List.member False model.minigameStatus) then
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn) 
+                                else
+                                    doNothing
+                                )
+                  ,    text "Upper"
                             |> centered
-                            |> size 6
+                            |> size 10
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(0, 6)
+                  ,    text "Engine"
+                            |> centered
+                            |> size 10
+                            |> sansserif
+                            |> filled yellow
+                            |> addOutline (solid 0.3) black
+                            |> move(0, -4)
                   ]
                      |> move (-65,5)
                      |> notifyTap (Core.DMsg MedToUppEng)
@@ -317,41 +414,38 @@ shapes (timedata,model) =
             , room
                   |> scale 1.75
                   |> move (63,18)
+                  |>  ( if (getMiniGameStatus model Core.Passcode) then
+                          doNothing
+                        else
+                          addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn) 
+                      )
             , text "Security"
                   |> centered
-                  |> size 6
+                  |> size 10
+                  |> sansserif
                   |> filled yellow
+                  |> addOutline (solid 0.3) black
                   |> move (63,30)
             , astronautRed
                   |> scale 0.25
                   |> move (55,15)
             , group
                   [
-                        circle 7
-                            |> filled orange
-                  ,     rect 10 10
-                            |> filled yellow
-                            |> scaleX 0.25
-                            |> scale 0.3
-                            |> scaleY 2.5
-                            |> move (0,2)
-                  ,     circle 7
-                            |> filled yellow
-                            |> scale 0.1
-                            |> move (0,-4)     
-                  ]
-                     |> move (75,15)
-                     |> notifyTap (Core.DMsg SecurToPassCode)
-            , group
-                  [
                        room
                             |> scale 1.5
                             |> move (-45,45)
+                            |>  ( if (getMiniGameStatus model Core.Leafs) then
+                                    doNothing
+                                    else
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn) 
+                                )
                   ,    text "Reactor"
                             |> centered
-                            |> size 6
+                            |> size 10
+                            |> sansserif
                             |> filled yellow
-                            |> move(-45,55)
+                            |> addOutline (solid 0.3) black
+                            |> move(-45,50)
                   ]
                      |> move (-25, -25)
                      |> notifyTap (Core.DMsg SecurToReact)
@@ -359,36 +453,53 @@ shapes (timedata,model) =
                   [
                        room
                             |> scale 1.5
-                            |> move (-25,-15)
-                  ,    text "Lower Engine"
+                            |> move (-22,-15)
+                            |> ( if (List.drop 2 model.minigameStatus |> List.member False) then 
+                                   addOutline (solid 0.5) (if (timedata.time * 20 |>  (+) 0.2 |> sin |> floor |> (==) 0) then flashOff else flashOn)
+                                 else
+                                    doNothing
+                               )
+                  ,    text "Lower"
                             |> centered
-                            |> size 6
+                            |> sansserif
+                            |> size 11
                             |> filled yellow
-                            |> move (-25, -10)
+                            |> addOutline (solid 0.3) black
+                            |> move (-22, -9)
+                  ,    text "Engine"
+                            |> centered
+                            |> sansserif
+                            |> size 11
+                            |> filled yellow
+                            |> addOutline (solid 0.3) black
+                            |> move (-22, -20)
                   ]
                      |> move (25, -25)
                      |> notifyTap (Core.DMsg SecurToLowerEngine)
         
-            ]
-        PassCode  ->
-            [ text "PassCodeGame"
-                  |> centered
-                  |> filled black
-            , group
-                  [
-                        roundedRect 40 20 5
-                            |> filled green
-                  ,     text "PassCodeToSecurity"
-                            |> centered
-                            |> size 8
-                            |> filled black
-                            |> move (0,-3)
-                  ]
-                     |> move (-25,-25)
-                     |> notifyTap (Core.DMsg PassCodeToSecurity)
-
-            ]
-
+            ] ++ ( if (getMiniGameStatus model Core.Passcode) then
+                     []
+                   else
+                     [
+                        group
+                            [
+                                    circle 7
+                                        |> filled orange
+                            ,     rect 10 10
+                                        |> filled yellow
+                                        |> scaleX 0.25
+                                        |> scale 0.3
+                                        |> scaleY 2.5
+                                        |> move (0,2)
+                            ,     circle 7
+                                        |> filled yellow
+                                        |> scale 0.1
+                                        |> move (0,-4)     
+                            ]
+                                |> move (75,15)
+                                |> notifyTap (Core.Shared (Core.GotoMinigame Core.Passcode))
+                     ]
+                  )
         LowerEngine  ->
             [bgMain
             ,rect 10 20
@@ -407,23 +518,39 @@ shapes (timedata,model) =
             , room
                   |> scale 1.5
                   |> move (-60,25)
-            , text "Lower Engine"
+            , text "Lower"
                   |> centered
-                  |> size 6
+                  |> size 8
+                  |> sansserif
                   |> filled yellow
-                  |> move (-60,30)
+                  |> addOutline (solid 0.2) black
+                  |> move (-60,35)
+            , text "Engine"
+                  |> centered
+                  |> size 8
+                  |> sansserif
+                  |> filled yellow
+                  |> addOutline (solid 0.2) black
+                  |> move (-60,25)
             , astronautRed
                   |> scale 0.25
-                  |> move (-60,20)
+                  |> move (-60,13)
             , group
                   [
                        room
                             |> scale 1.5
                             |> move (25,-15)
+                            |>  (   if (getMiniGameStatus model Core.Wires) then 
+                                        doNothing
+                                    else
+                                        addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn )
+                                ) 
                   ,    text "Electrical"
                             |> centered
-                            |> size 6
+                            |> size 8
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.2) black
                             |> move (25, -10)
                   ]
                      |> move (-25, -25)
@@ -433,10 +560,17 @@ shapes (timedata,model) =
                        room
                             |> scale 1.5
                             |> move (30,50)
+                            |>  (   if (getMiniGameStatus model Core.Swipe) then 
+                                        doNothing
+                                    else
+                                        addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn )
+                                ) 
                   ,    text "Storage"
                             |> centered
-                            |> size 6
+                            |> size 8
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.2) black
                             |> move (30, 55)
                   ]
                      |> move (25, -25)
@@ -460,64 +594,66 @@ shapes (timedata,model) =
             , room
                   |> scale 1.75
                   |> move (-45,20)
+                  |>  (   if (getMiniGameStatus model Core.Wires) then 
+                            doNothing
+                          else
+                            addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn )
+                      )   
             , text "Electrical"
                   |> centered
+                  |> size 18
+                  |> sansserif
                   |> filled yellow
+                  |> addOutline (solid 0.5) black
                   |> scale 0.5
-                  |> move (-45,35)
+                  |> move (-45,30)
             , astronautRed
                   |> scale 0.25
                   |> move (-55,15)
                   -- wires mini game --
             , group
                   [
-                        circle 7
-                            |> filled orange
-                  ,     rect 10 10
-                            |> filled yellow
-                            |> scaleX 0.25
-                            |> scale 0.3
-                            |> scaleY 2.5
-                            |> move (0,2)
-                  ,     circle 7
-                            |> filled yellow
-                            |> scale 0.1
-                            |> move (0,-4)     
-                  ]
-                     |> move (-30,17)
-                     |> notifyTap (Core.DMsg ElectricalToWires)
-            , group
-                  [
                        room
                             |> scale 1.5
                             |> move (55,0)
+                            |>  (   if (getMiniGameStatus model Core.Swipe) then 
+                                        doNothing
+                                    else
+                                        addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn )
+                                ) 
                   ,    text "Storage"
                             |> centered
-                            |> size 6
+                            |> size 10
+                            |> sansserif
                             |> filled yellow
-                            |> move(55, 10)
+                            |> addOutline (solid 0.3) black
+                            |> move(55, 7)
                   ]
                      |> move (0, -25)
                      |> notifyTap (Core.DMsg ElectricToStorage)
-            ]
-        Wires  ->
-            [ text "Wires"
-                  |> centered
-                  |> filled black
-            , group
-                  [
-                        roundedRect 40 20 5
-                            |> filled green
-                  ,     text "WiresToElectrical"
-                            |> centered
-                            |> size 8
-                            |> filled black
-                            |> move (0,-3)
-                  ]
-                     |> move (-25,-25)
-                     |> notifyTap (Core.DMsg WiresToElectrical)
-            ]
-
+            ] ++ (if (getMiniGameStatus model Core.Wires) then
+                      []
+                  else
+                      [
+                        group
+                            [
+                                    circle 7
+                                        |> filled orange
+                            ,     rect 10 10
+                                        |> filled yellow
+                                        |> scaleX 0.25
+                                        |> scale 0.3
+                                        |> scaleY 2.5
+                                        |> move (0,2)
+                            ,     circle 7
+                                        |> filled yellow
+                                        |> scale 0.1
+                                        |> move (0,-4)     
+                            ]
+                                |> move (-30,17)
+                                |> notifyTap (Core.Shared (Core.GotoMinigame Core.Wires))
+                      ]
+                 )
         Storage  ->
             [bgMain
             ,rect 10 20
@@ -541,18 +677,27 @@ shapes (timedata,model) =
                   |> move (0,-45)
             , text "Storage"
                   |> centered
-                  |> size 6
+                  |> size 10
+                  |> sansserif
                   |> filled yellow
-                  |> move (0,-35)
+                  |> addOutline (solid 0.3) black
+                  |> move (0,-33)
             , group
                   [
                        room
                             |> scale 1.5
                             |> move (85,20)
+                            |> (if (getMiniGameStatus model Core.Swipe) then
+                                    doNothing
+                                else
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn)
+                               )
                   ,    text "Admin"
                             |> centered
-                            |> size 6
+                            |> size 9
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(85, 20)
                   ]
                      |> move (-25, -25)
@@ -562,10 +707,17 @@ shapes (timedata,model) =
                        room
                             |> scale 1.5
                             |> move (-25,60)
+                            |> (if (List.take 3 model.minigameStatus |> List.member False) then
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn)
+                                else
+                                    doNothing
+                               )
                   ,    text "Cafeteria"
                             |> centered
-                            |> size 6
+                            |> size 9
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.25) black
                             |> move(-25, 60)
                   ]
                      |> move (25, -25)
@@ -589,65 +741,87 @@ shapes (timedata,model) =
             , room
                   |> scale 1.75
                   |> move (60,0)
+                  |> ( if (getMiniGameStatus model Core.Swipe) then
+                         doNothing
+                       else
+                         addOutline (solid 0.5) (if (timedata.time * 20 |> sin |> floor |> (==) 0) then flashOff else flashOn)
+                     )
             , astronautRed
                   |> scale 0.25
                   |> move (50,-5)
             , text "Admin"
                   |> centered
+                  |> size 20
+                  |> sansserif
                   |> filled yellow
+                  |> addOutline (solid 0.5) black
                   |> scale 0.5
                   |> move (60,10)
                   -- card swipe mini game --
             , group
                   [
-                        circle 7
-                            |> filled orange
-                  ,     rect 10 10
-                            |> filled yellow
-                            |> scaleX 0.25
-                            |> scale 0.3
-                            |> scaleY 2.5
-                            |> move (0,2)
-                  ,     circle 7
-                            |> filled yellow
-                            |> scale 0.1
-                            |> move (0,-4)   
-                  ]
-                     |> move (70,-3)
-                     |> notifyTap (Core.DMsg AdminToCardSwipe)
-            , group
-                  [
                        room
                             |> scale 1.5
                             |> move (-10,60)
+                            |> (if (List.take 3 model.minigameStatus |> List.member False) then
+                                    addOutline (solid 0.5) (if (timedata.time * 20 |> cos |> floor |> (==) 0) then flashOff else flashOn)
+                                else
+                                    doNothing
+                               )
                   ,    text "Cafeteria"
                             |> centered
-                            |> size 6
+                            |> size 9
+                            |> sansserif
                             |> filled yellow
+                            |> addOutline (solid 0.3) black
                             |> move(-10, 60)
                   ]
                      |> move (0, -25)
                      |> notifyTap (Core.DMsg AdminToCafeteria)
+            ] ++ (if (getMiniGameStatus model Core.Swipe) then
+                    []
+                  else
+                      [
+                          group
+                            [
+                                    circle 7
+                                        |> filled orange
+                            ,     rect 10 10
+                                        |> filled yellow
+                                        |> scaleX 0.25
+                                        |> scale 0.3
+                                        |> scaleY 2.5
+                                        |> move (0,2)
+                            ,     circle 7
+                                        |> filled yellow
+                                        |> scale 0.1
+                                        |> move (0,-4)   
+                            ]
+                                |> move (70,-3)
+                                |> notifyTap (Core.Shared (Core.GotoMinigame Core.Swipe))
+                      ]
+                 )
+        RestartScreen -> [
+                    bgMain
+                ,   text "All Tasks Completed"
+                        |> centered
+                        |> size 20
+                        |> sansserif
+                        |> filled white
+                        |> addOutline (solid 0.5) red
+                ,   group
+                        [
+                                roundedRect 50 20 3
+                                    |> filled green
+                                    |> addOutline (solid 1) blue
+                            ,   text "Replay"
+                                    |> centered
+                                    |> filled blue
+                                    |> move (0, -4)
+                        ] |> move (0, -20)
+                          |> notifyTap (Core.Shared Core.Restart)
+               
             ]
-        CardSwipe  ->
-            [ text "CardSwipe"
-                  |> centered
-                  |> filled black
-            , group
-                  [
-                        roundedRect 40 20 5
-                            |> filled green
-                  ,     text "CardSwipeToAdmin"
-                            |> centered
-                            |> size 8
-                            |> filled black
-                            |> move (0,-3)
-                  ]
-                     |> move (-25,-25)
-                     |> notifyTap (Core.DMsg CardSwipeToAdmin)
-                
-            ]
-
 
 startText =
     text "Among Us"
@@ -880,46 +1054,48 @@ type Msg = WelcomeToCaf
          | UppEngToSecurity 
          | UppEngToLowEng
          | SecurToLowerEngine 
-         | SecurToPassCode
-         | PassCodeToSecurity
          | ReactToLowerEngine
-         | ReactToCleanUp
-         | CleanUpToReact
          | LowerEngToElectric 
          | MedToUppEng 
          | LowerEngToStorage 
          | ElectricToStorage
-         | ElectricalToWires
-         | WiresToElectrical 
          | StorageToAdmin 
          | StorageToCafeteria 
-         | AdminToCardSwipe
-         | CardSwipeToAdmin
          | AdminToCafeteria 
 
 type State = WelcomePage 
            | Cafeteria 
            | UpperEngine 
            | Reactor
-           | CleanUp 
            | MedBay 
            | Security 
-           | PassCode
            | LowerEngine 
            | Electrical 
-           | Wires
            | Storage 
-           | CardSwipe
            | Admin 
+           | RestartScreen
 
 
 update : (Core.CoreMsg a Msg c d e) -> (Core.TimeData,Model) -> (Core.TimeData,Model)
 update msg (timedata,model) =
   case msg of 
     Core.Shared a -> case a of 
-        Core.Next b -> (timedata,model) -- if they win, this
+        Core.Next succ ->
+            let
+                newMinigameStatus = if (succ == 1) then
+                                        setMiniGameStatus model.minigameStatus model.currentMiniGame True
+                                    else
+                                        model.minigameStatus
+            in
+            if (List.member False newMinigameStatus) then
+                (timedata, { model | minigameStatus = newMinigameStatus }) -- if they win, this
+            else
+                (timedata, { model | minigameStatus = newMinigameStatus, state = RestartScreen})
+        Core.SetupMinigame mini ->
+            (timedata, { model | currentMiniGame = mini })
         _ -> (timedata,model) -- if they lose, this
-    Core.DMsg a -> case a of 
+    Core.DMsg a ->
+        case a of 
         WelcomeToCaf  ->
             case model.state of
                 WelcomePage  ->
@@ -961,18 +1137,6 @@ update msg (timedata,model) =
                     (timedata, { model | state = Security  })
                 otherwise ->
                     (timedata,model)
-        ReactToCleanUp  ->
-            case model.state of
-                Reactor  ->
-                    (timedata, { model | state = CleanUp  })
-                otherwise ->
-                    (timedata,model)
-        CleanUpToReact  ->
-            case model.state of
-                CleanUp  ->
-                    (timedata, { model | state = Reactor  })
-                otherwise ->
-                    (timedata,model)        
         SecurToReact  ->
             case model.state of
                 Security  ->
@@ -980,19 +1144,6 @@ update msg (timedata,model) =
 
                 otherwise ->
                     (timedata,model)
-        SecurToPassCode  ->
-            case model.state of
-                Security  ->
-                    (timedata, { model | state = PassCode  })
-                otherwise ->
-                    (timedata,model)
-        PassCodeToSecurity  ->
-            case model.state of
-                PassCode  ->
-                    (timedata, { model | state = Security  })
-                otherwise ->
-                    (timedata,model)
-
         UppEngToSecurity  ->
             case model.state of
                 UpperEngine  ->
@@ -1039,19 +1190,6 @@ update msg (timedata,model) =
             case model.state of
                 Electrical  ->
                     (timedata, { model | state = Storage  })
-
-                otherwise ->
-                    (timedata,model)
-        ElectricalToWires  ->
-            case model.state of
-                Electrical ->
-                    (timedata, { model | state = Wires  })
-                otherwise ->
-                    (timedata,model)
-        WiresToElectrical  ->
-            case model.state of
-                Wires ->
-                    (timedata, { model | state = Electrical  })
                 otherwise ->
                     (timedata,model)
         StorageToAdmin  ->
@@ -1068,18 +1206,6 @@ update msg (timedata,model) =
 
                 otherwise ->
                     (timedata,model)
-        AdminToCardSwipe  ->
-            case model.state of
-                Admin ->
-                    (timedata, { model | state = CardSwipe  })
-                otherwise ->
-                    (timedata,model)
-        CardSwipeToAdmin  ->
-            case model.state of
-                CardSwipe ->
-                    (timedata, { model | state = Admin  })
-                otherwise ->
-                    (timedata,model)
         AdminToCafeteria  ->
             case model.state of
                 Admin  ->
@@ -1092,13 +1218,34 @@ update msg (timedata,model) =
 type alias Model =
     { time : Float
     , state : State
+    , currentMiniGame : Core.Minigame
+    , minigameStatus : List Bool
     }
 
-type alias Point = (Float, Float)
 
 init : Model
 init = { time = 0 
        , state = WelcomePage 
+       , currentMiniGame = Core.Swipe
+       , minigameStatus =  [ False, False, False, False ]
        }
-    
-    
+
+getElement : List a -> Int -> a
+getElement li idx = case (List.head <| List.drop idx li) of
+    Just a -> a
+    Nothing -> Debug.todo "Index out of bounds"
+
+getMiniGameStatus : Model -> Core.Minigame -> Bool
+getMiniGameStatus model mini = case mini of
+    Core.Leafs -> getElement model.minigameStatus 0
+    Core.Passcode -> getElement model.minigameStatus 1
+    Core.Wires -> getElement model.minigameStatus 2
+    Core.Swipe -> getElement model.minigameStatus 3
+
+setMiniGameStatus : List Bool -> Core.Minigame -> Bool -> List Bool
+setMiniGameStatus cStatus mini status =
+     case mini of
+            Core.Leafs -> status :: (List.drop 1 cStatus)
+            Core.Passcode -> (List.take 1 cStatus) ++ [status] ++ (List.drop 2 cStatus)
+            Core.Wires -> (List.take 2 cStatus) ++ [status] ++ (List.drop 3 cStatus)
+            Core.Swipe -> (List.take 3 cStatus) ++ [status]

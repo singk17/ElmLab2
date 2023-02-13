@@ -97,10 +97,6 @@ update msg (timedata,model) =
                         <| Waiting 1
                         <| ShowPassword (model.currentPassword) 0
                     ) |> setupAnimation (timedata,model)
-                    -- Debug.log "Fail" ((newPasswordList,currentPassword),(
-                    --   Core.restartTime timedata,
-                    --   init
-                    -- )) |> Tuple.second
                 else
                   (timedata, { model | btnPressTime = timedata.truetime, userPassword = newPasswordList, lastBtnPress = idx })
         Core.Tick t _ -> checkBtnTimeOut t (timedata,model)
@@ -157,17 +153,17 @@ modelAnimationUpdate (timedata,model) =
           (timedata,model)
       ShowPassword pi di -> 
         let
-          ss = Debug.log "tt" timedata
+          ss = timedata
         in
         if (timedata.time > 1) then
           let
-            rTime = Core.restartTime <| Debug.log "otime" timedata
+            rTime = Core.restartTime timedata
             passwordToShow = getElement model.correctPassword pi
           in
           if (di + 1 >= List.length passwordToShow) then
-            (Debug.log "done" rTime,{ model | state = Game, showerLit = -1 })
+            (rTime,{ model | state = Game, showerLit = -1 })
           else
-            (Debug.log "upd" rTime,{ model | anim = ShowPassword pi (di + 1), showerLit = getElement passwordToShow (di + 1) })
+            (rTime,{ model | anim = ShowPassword pi (di + 1), showerLit = getElement passwordToShow (di + 1) })
         else
           (timedata,model)
       FinishGame -> (timedata,model)
